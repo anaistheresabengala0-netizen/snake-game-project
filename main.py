@@ -30,7 +30,7 @@ def grid_lines():
     pass
 
 food = Food()
-food_surface = pygame.image.load('apple.png')
+# food_surface = pygame.image.load('apple.png')
 
 
 while running:
