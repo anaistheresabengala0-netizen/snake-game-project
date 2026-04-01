@@ -21,7 +21,7 @@ class Food:
         self.position = Vector2(5,6)
     def draw(self):
         food_rect = pygame.Rect(self.position.x*cell,self.position.y*cell,cell,cell)
-        screen.blit(food_surface,food_rect)
+        # screen.blit(food_surface,food_rect)
         pass
 
 
