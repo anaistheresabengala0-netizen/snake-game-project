@@ -1,16 +1,36 @@
 
 import pygame
-
+from pygame.math import Vector2
 
 li = pygame.init()
 
-screen = pygame.display.set_mode((800,800))
+cell = 30
+cell_num = 25
+screen = pygame.display.set_mode((cell*cell_num,cell*cell_num))
 
 
 
 clock = pygame.time.Clock()
 
 running = True 
+
+class Food:
+    def __init__(self):
+
+        # food position
+        self.position = Vector2(5,6)
+    def draw(self):
+        food_rect = pygame.Rect(self.position.x*cell,self.position.y*cell,cell,cell)
+        screen.blit(food_surface,food_rect)
+        pass
+
+
+def grid_lines():
+
+    pass
+
+food = Food()
+food_surface = pygame.image.load('apple.png')
 
 
 while running:
@@ -20,7 +40,11 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    screen.fill("blue")#yill the screen with a color to wipe away anything from last fram. 
+
+    #visual elements
+    screen.fill("aquamarine3")#yill the screen with a color to wipe away anything from last fram. 
+    food.draw()
+
 
     # here we can render the game here. 
 
