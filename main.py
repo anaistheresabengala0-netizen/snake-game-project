@@ -4,9 +4,13 @@ from pygame.math import Vector2
 
 li = pygame.init()
 
+WIDTH = 800
+HEIGHT = 800
+
 cell = 30
 cell_num = 25
-screen = pygame.display.set_mode((cell*cell_num,cell*cell_num))
+# screen = pygame.display.set_mode((cell*cell_num,cell*cell_num))
+screen = pygame.display.set_mode((WIDTH,HEIGHT))
 
 
 
@@ -26,12 +30,18 @@ class Food:
 
 
 def grid_lines():
+    for line in range(0,HEIGHT,10):
+        pygame.draw.line(surface=screen,color=(0,0,0),start_pos=(0,line),end_pos=(800,line), width=1)
+    for line in range(0,WIDTH,10):
+        pygame.draw.line(surface=screen, color=(255,0,0),start_pos=(line,0),end_pos=(line,800), width=1)
+    pygame.display.flip()
 
     pass
 
 food = Food()
 # food_surface = pygame.image.load('apple.png')
 
+grid_lines()
 
 while running:
     # this is the game loop that pools for events
@@ -44,6 +54,7 @@ while running:
     #visual elements
     screen.fill("aquamarine3")#yill the screen with a color to wipe away anything from last fram. 
     food.draw()
+    grid_lines()
 
 
     # here we can render the game here. 
