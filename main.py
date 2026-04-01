@@ -30,9 +30,9 @@ class Food:
 
 
 def grid_lines():
-    for line in range(0,HEIGHT,10):
+    for line in range(0,HEIGHT,20):
         pygame.draw.line(surface=screen,color=(0,0,0),start_pos=(0,line),end_pos=(800,line), width=1)
-    for line in range(0,WIDTH,10):
+    for line in range(0,WIDTH,20):
         pygame.draw.line(surface=screen, color=(255,0,0),start_pos=(line,0),end_pos=(line,800), width=1)
     pygame.display.flip()
 
