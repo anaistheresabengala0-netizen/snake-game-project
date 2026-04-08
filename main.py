@@ -11,9 +11,13 @@ cell = 20
 cell_num = 25
 # screen = pygame.display.set_mode((cell*cell_num,cell*cell_num))
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
-apple = pygame.image.load('appa.png').convert_alpha()#loads image from code folder and convert it to a python-friendly format
-apple = pygame.transform.scale(apple, (cell-1,cell-1))# resize image
+
+#loads image from code folder and convert it to a python-friendly format
+apple = pygame.image.load('appa.png').convert_alpha()
 apple_rot = pygame.image.load('applerot.png').convert_alpha()
+
+# resize image to fit in grid
+apple = pygame.transform.scale(apple, (cell-1,cell-1))
 apple_rot = pygame.transform.scale(apple_rot, (cell-1,cell-1))
 clock = pygame.time.Clock()
 
