@@ -53,6 +53,9 @@ class Poison:
 
 
 
+
+
+
 def grid_lines():
     """for y in range(0,HEIGHT,20):
         pygame.draw.line(screen,"yellow2",(0,y), (WIDTH, y ))
@@ -72,17 +75,82 @@ def grid_lines():
     pass
 
 
+def get_level_and_speed(level=1):
+    if level == 1:
+        return {"level": 1, "speed": 5}
+    if level == 2:
+        return {"level": 2, "speed": 10}
+    if level == 3:
+        return {"level": 3, "speed": 15}
+    # default
+    return {"level": 1, "speed": 5}
+
+    
 class Snake:
     def __init__(self):
-        self.body = [Vector2(6,9), Vector2(5,9), Vector2(4,9)]# snake initial position
+        self.body = [Vector2(6,9), Vector2(5,9), Vector2(4,9)]
+        self.direction = Vector2(1,0)
+        level_info = get_level_and_speed()
+        level_info = get_level_and_speed(level=1)
+        self.level = level_info["level"]
+        self.speed = level_info["speed"]
+
+
 
     def draw(self):
         for segment in self.body:
             segment_rect = (segment.x * cell, segment.y * cell, cell, cell)# making the snake rectangular (x,y,width,height)
             pygame.draw.rect(screen, "indigo", segment_rect)
-        pass
+        
+    
+    def move(self):
+        new_head = self.body[0] + self.direction
+        self.body.insert(0, new_head)
+        self.body.pop()  
+    
+    def move_right(self):
+        self.direction = Vector2(1, 0)
+        
+    def move_right(self):
+        self.direction = Vector2(1, 0)
+
+    def move_left(self):
+        self.direction = Vector2(-1, 0)
+
+    def move_up(self):
+        self.direction = Vector2(0, -1)
+
+    def move_down(self):
+        self.direction = Vector2(0, 1)
+
 
 snake = Snake()
+# snake.draw()
+
+
+
+
+def track_key_press():
+    key_press = pygame.key.get_pressed()
+    if key_press[pygame.K_LEFT]:
+        snake.move_left()
+    if key_press[pygame.K_RIGHT]:
+        snake.move_right()
+    if key_press[pygame.K_UP]:
+        snake.move_up()
+    if key_press[pygame.K_DOWN]:
+        snake.move_down()
+    if key_press[pygame.K_SPACE]:
+        print("Space key pressed")
+
+
+
+
+    
+    
+
+    
+
 
 food = Food()
 
@@ -105,11 +173,13 @@ while running:
     snake.draw()
     food.draw()
     poison.draw()
+    track_key_press()
+    snake.move()
     # here we can render the game here. 
 
 
     pygame.display.flip() # flip th display to put your work on the screen
-    clock.tick(60)
+    clock.tick(snake.speed)
 
 pygame.quit()
 
