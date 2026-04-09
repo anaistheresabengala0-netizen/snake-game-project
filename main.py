@@ -3,6 +3,7 @@ import pygame
 from pygame.math import Vector2
 
 li = pygame.init()
+scene = "MENU"
 
 WIDTH = 600
 HEIGHT = 600
@@ -71,25 +72,69 @@ def grid_lines():
     pass
 
 
-def get_level_and_speed(level=1):
-    if level == 1:
-        return {"level": 1, "speed": 5}
-    if level == 2:
-        return {"level": 2, "speed": 10}
-    if level == 3:
-        return {"level": 3, "speed": 15}
-    # default
-    return {"level": 1, "speed": 5}
+
+class Button:
+    def __init__(self, text, x, y, width, height, color, hover_color):
+        self.text = text
+        self.rect = pygame.Rect(x, y, width, height)
+        self.color = color
+        self.hover_color = hover_color
+        self.font = pygame.font.SysFont("Arial", 30)
+
+    def draw(self, surface):
+        mouse_pos = pygame.mouse.get_pos()
+        current_color = self.hover_color if self.rect.collidepoint(mouse_pos) else self.color
+        
+        pygame.draw.rect(surface, current_color, self.rect, border_radius=15)
+   
+        text_surf = self.font.render(self.text, True, (255, 255, 255))
+        text_rect = text_surf.get_rect(center=self.rect.center)
+        surface.blit(text_surf, text_rect)
+
+    def is_clicked(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if self.rect.collidepoint(event.pos):
+                return True
+        return False
+
+
+
+
+btn_easy = Button("EASY", 300, 200, 200, 60, (50, 150, 50), (70, 210, 70))
+btn_med  = Button("MEDIUM", 300, 300, 200, 60, (200, 150, 0), (240, 190, 0))
+btn_hard = Button("HARD", 300, 400, 200, 60, (150, 50, 50), (210, 70, 70))
+
+
+
+def get_level_and_speed(scene,event=None):
+     if scene == "MENU":
+            # Check for button clicks only when in Menu
+            if btn_easy.is_clicked(event):
+                scene = "GAME"
+                return {"level": 'EASY', "speed": 5}
+            if btn_med.is_clicked(event):
+                scene = "GAME"
+                return {"level": 'EASY', "speed": 5}
+            if btn_hard.is_clicked(event):
+               
+                scene = "GAME"
+                return {"level": 'EASY', "speed": 5}
+        
+            elif scene == "GAME":
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    scene = "MENU"
+
 
     
 class Snake:
     def __init__(self):
         self.body = [Vector2(6,9), Vector2(5,9), Vector2(4,9)]
         self.direction = Vector2(1,0)
-        level_info = get_level_and_speed()
-        level_info = get_level_and_speed(level=1)
-        self.level = level_info["level"]
-        self.speed = level_info["speed"]
+        # level_info = get_level_and_speed()
+        # level_info = get_level_and_speed(level=1)
+        # self.level = level_info["level"]
+        # self.speed = level_info["speed"]
+        self.speed = 5
 
 
 
@@ -159,11 +204,14 @@ while running:
     # this is the game loop that pools for events
     # the pygame.QUIT event means the user clicked x to close the window. 
     for event in pygame.event.get():
+
         if event.type == pygame.QUIT:
             running = False
+        get_level_and_speed(scene="MENU",event=event)
 
 
     #visual elements
+   
     screen.fill("aquamarine3")#yill the screen with a color to wipe away anything from last fram. 
     grid_lines()
     snake.draw()
