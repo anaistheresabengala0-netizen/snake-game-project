@@ -1,16 +1,16 @@
-
 import pygame, random, time
 from pygame.math import Vector2
 
 li = pygame.init()
 scene = "MENU"
+current_speed = 5
+current_level = "EASY"
 
-WIDTH = 600
-HEIGHT = 600
+WIDTH = 800
+HEIGHT = 800
 
 cell = 20
 cell_num = 25
-# screen = pygame.display.set_mode((cell*cell_num,cell*cell_num))
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 
 #loads image from code folder and convert it to a python-friendly format
@@ -126,34 +126,22 @@ btn_hard = Button("HARD", 300, 400, 200, 60, (150, 50, 50), (210, 70, 70))
 
 
 
-def get_level_and_speed(scene,event=None):
-     if scene == "MENU":
-            # Check for button clicks only when in Menu
-            if btn_easy.is_clicked(event):
-                scene = "GAME"
-                return {"level": 'EASY', "speed": 5}
-            if btn_med.is_clicked(event):
-                scene = "GAME"
-                return {"level": 'EASY', "speed": 5}
-            if btn_hard.is_clicked(event):
-               
-                scene = "GAME"
-                return {"level": 'EASY', "speed": 5}
-        
-            elif scene == "GAME":
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    scene = "MENU"
+def get_level_and_speed(event):
+    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        if btn_easy.is_clicked(event):
+            return {"level": "EASY", "speed": 5}
+        if btn_med.is_clicked(event):
+            return {"level": "MEDIUM", "speed": 10}
+        if btn_hard.is_clicked(event):
+            return {"level": "HARD", "speed": 15}
+    return None
 
 
-    
 class Snake:
     def __init__(self):
         self.body = [Vector2(6,9), Vector2(5,9), Vector2(4,9)]
         self.direction = Vector2(1,0)
         self.add = False
-        # level_info = get_level_and_speed()
-        # level_info = get_level_and_speed(level=1)
-        # self.level = level_info["level"]
         self.speed = 5
 
 
@@ -245,23 +233,35 @@ while running:
 
         if event.type == pygame.QUIT:
             running = False
-        get_level_and_speed(scene="MENU",event=event)
+
+        if scene == "MENU":
+            result = get_level_and_speed(event)
+            if result is not None:
+                current_level = result["level"]
+                current_speed = result["speed"]
+                snake.speed = current_speed
+                scene = "GAME"
+        elif scene == "GAME":
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                scene = "MENU"
 
 
     #visual elements
    
     screen.fill("aquamarine3")#yill the screen with a color to wipe away anything from last fram. 
-    grid_lines()
-    snake.draw()
-    food.draw()
-    poison.draw()
-    track_key_press()
-    snake.move()
-    coll.food_collision()
-    coll.poison_collision()
-    # here we can render the game here. 
-
-
+    if scene == "MENU":
+        btn_easy.draw(screen)
+        btn_med.draw(screen)
+        btn_hard.draw(screen)
+    elif scene == "GAME":
+        grid_lines()
+        snake.draw()
+        food.draw()
+        poison.draw()
+        track_key_press()
+        snake.move()
+        coll.food_collision()
+        coll.poison_collision()
     pygame.display.flip() # flip th display to put your work on the screen
     clock.tick(snake.speed)
 
