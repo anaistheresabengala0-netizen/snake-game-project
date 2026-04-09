@@ -1,5 +1,5 @@
 
-import pygame
+import pygame, random, time
 from pygame.math import Vector2
 
 li = pygame.init()
@@ -12,9 +12,13 @@ cell = 20
 cell_num = 25
 # screen = pygame.display.set_mode((cell*cell_num,cell*cell_num))
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
-apple = pygame.image.load('appa.png').convert_alpha()#loads image from code folder and convert it to a python-friendly format
-apple = pygame.transform.scale(apple, (cell-1,cell-1))# resize image
-apple_rot = pygame.image.load('applerot.png').convert_alpha()
+
+#loads image from code folder and convert it to a python-friendly format
+apple = pygame.image.load('appa.png').convert_alpha()
+apple_rot = pygame.image.load('poison.png').convert_alpha()
+
+# resize image to fit in grid
+apple = pygame.transform.scale(apple, (cell-1,cell-1))
 apple_rot = pygame.transform.scale(apple_rot, (cell-1,cell-1))
 clock = pygame.time.Clock()
 
@@ -22,9 +26,9 @@ running = True
 
 class Food:
     def __init__(self):
-
         # food position
-        self.position = Vector2(5,6)
+        self.position = self.random_position()
+
     def draw(self):
         #food_rect = pygame.Rect(self.position.x*cell,
                                 #self.position.y*cell,
@@ -36,19 +40,35 @@ class Food:
         y = int(self.position.y * cell + cell / 2)
         food_rect = apple.get_rect(center = (x, y))
         screen.blit(apple,food_rect)
+
+    def random_position(self):
+        x = random.randint(0, cell_num - 1)
+        y = random.randint(0, cell_num - 1)
+        position = Vector2(x,y)
+        return position
         pass
+food = Food()
+
+
 
 class Poison:
     def __init__(self):
 
         # food position
-        self.position = Vector2(9,6)
+        self.position = self.random_position()
     def draw(self):
         food_rect = pygame.Rect(self.position.x*cell,self.position.y*cell,cell,cell)
         screen.blit(apple_rot,food_rect)
+        
+    
+    def random_position(self):
+        x = random.randint(0, cell_num - 1)
+        y = random.randint(0, cell_num - 1)
+        position = Vector2(x,y)
+        return position
         pass
 
-
+poison = Poison()
 
 
 
@@ -130,12 +150,11 @@ class Snake:
     def __init__(self):
         self.body = [Vector2(6,9), Vector2(5,9), Vector2(4,9)]
         self.direction = Vector2(1,0)
+        self.add = False
         # level_info = get_level_and_speed()
         # level_info = get_level_and_speed(level=1)
         # self.level = level_info["level"]
-        # self.speed = level_info["speed"]
         self.speed = 5
-
 
 
     def draw(self):
@@ -147,11 +166,11 @@ class Snake:
     def move(self):
         new_head = self.body[0] + self.direction
         self.body.insert(0, new_head)
-        self.body.pop()  
+        if self.add:
+            self.add = False
+        else:
+            self.body.pop()  
     
-    def move_right(self):
-        self.direction = Vector2(1, 0)
-        
     def move_right(self):
         self.direction = Vector2(1, 0)
 
@@ -163,6 +182,8 @@ class Snake:
 
     def move_down(self):
         self.direction = Vector2(0, 1)
+    
+    
 
 
 snake = Snake()
@@ -186,16 +207,33 @@ def track_key_press():
 
 
 
+    
+class Collisions():
+    def __init__(self,snake,food,poison):
+        self.snake = snake
+        self.food = food
+        self.poison = poison
+        self.food_collision()
+    
+    def food_collision(self):
+       if self.snake.body[0] == self.food.position:
+        self.food.position = self.food.random_position()
+        self.snake.add = True
+    
+    def poison_collision(self):
+        if self.snake.body[0] == self.poison.position:
+            self.poison.position = self.poison.random_position()
+
+            if len(self.snake.body) > 1:
+                self.snake.body.pop()
+
+    pass 
 
     
-    
-
-    
+coll = Collisions(snake,food,poison)
 
 
-food = Food()
 
-poison = Poison()
 # food_surface = pygame.image.load('apple.png')
 
 grid_lines()
@@ -219,6 +257,8 @@ while running:
     poison.draw()
     track_key_press()
     snake.move()
+    coll.food_collision()
+    coll.poison_collision()
     # here we can render the game here. 
 
 
