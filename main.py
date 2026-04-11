@@ -1,7 +1,7 @@
 import pygame, random, time
 from pygame.math import Vector2
 
-li = pygame.init()
+pygame.init()
 scene = "MENU"
 current_speed = 5
 current_level = "EASY"
@@ -12,6 +12,9 @@ HEIGHT = 800
 cell = 20
 cell_num = 25
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
+
+
+text_font = pygame.font.SysFont("Arial", 34)
 
 #loads image from code folder and convert it to a python-friendly format
 apple = pygame.image.load('appa.png').convert_alpha()
@@ -143,6 +146,8 @@ class Snake:
         self.direction = Vector2(1,0)
         self.add = False
         self.speed = 5
+        self.paused = False
+        self.score = 0
 
 
     def draw(self):
@@ -152,6 +157,8 @@ class Snake:
         
     
     def move(self):
+        if self.paused:
+            return
         new_head = self.body[0] + self.direction
         self.body.insert(0, new_head)
         if self.add:
@@ -160,16 +167,22 @@ class Snake:
             self.body.pop()  
     
     def move_right(self):
-        self.direction = Vector2(1, 0)
+        if not self.paused:
+            self.direction = Vector2(1, 0)
 
     def move_left(self):
-        self.direction = Vector2(-1, 0)
+        if not self.paused:
+            self.direction = Vector2(-1, 0)
 
     def move_up(self):
-        self.direction = Vector2(0, -1)
+        if not self.paused:
+            self.direction = Vector2(0, -1)
 
     def move_down(self):
-        self.direction = Vector2(0, 1)
+        if not self.paused:
+            self.direction = Vector2(0, 1)
+    def pause_game(self):
+        self.paused = not self.paused
     
     
 
@@ -190,9 +203,6 @@ def track_key_press():
         snake.move_up()
     if key_press[pygame.K_DOWN]:
         snake.move_down()
-    if key_press[pygame.K_SPACE]:
-        print("Space key pressed")
-
 
 
     
@@ -202,27 +212,40 @@ class Collisions():
         self.food = food
         self.poison = poison
         self.food_collision()
-    
+
     def food_collision(self):
-       if self.snake.body[0] == self.food.position:
-        self.food.position = self.food.random_position()
-        self.snake.add = True
-    
+        if self.snake.body[0] == self.food.position:
+            self.food.position = self.food.random_position()
+            self.snake.add = True
+            self.snake.score += 1
+
     def poison_collision(self):
         if self.snake.body[0] == self.poison.position:
             self.poison.position = self.poison.random_position()
-
             if len(self.snake.body) > 1:
                 self.snake.body.pop()
+                if snake.score >=1:
+                    self.snake.score -= 1
 
-    pass 
+    def wall_collision(self):
+        head = self.snake.body[0]
+        if head.x < 0 or head.x >= cell_num or head.y < 0 or head.y >= cell_num:
+            return True
+        return False
 
-    
+    def self_collision(self):
+        head = self.snake.body[0]
+        if head in self.snake.body[1:]:
+            return True
+        return False
+
+
 coll = Collisions(snake,food,poison)
 
+# Track game start time (for timer)
+start_time = pygame.time.get_ticks()
 
 
-# food_surface = pygame.image.load('apple.png')
 
 grid_lines()
 
@@ -240,11 +263,18 @@ while running:
                 current_level = result["level"]
                 current_speed = result["speed"]
                 snake.speed = current_speed
+                snake.body = [Vector2(6,9), Vector2(5,9), Vector2(4,9)]
+                snake.direction = Vector2(1,0)
+                snake.score = 0
+                snake.paused = False
+                start_time = pygame.time.get_ticks()
                 scene = "GAME"
         elif scene == "GAME":
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                scene = "MENU"
-
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    scene = "MENU"
+                if event.key == pygame.K_SPACE:
+                    snake.pause_game()
 
     #visual elements
    
@@ -262,6 +292,39 @@ while running:
         snake.move()
         coll.food_collision()
         coll.poison_collision()
+
+        #score and timer
+        elapsed_ms = pygame.time.get_ticks() - start_time
+        elapsed_sec = elapsed_ms // 1000
+        score_and_timer = f"Score: {snake.score}   Time: {elapsed_sec}s"
+        score_and_timer_surface = text_font.render(score_and_timer, True, (255, 255, 255))
+        screen.blit(score_and_timer_surface, (10, 750))
+
+        game_over = coll.wall_collision() or coll.self_collision()
+        if game_over:
+            overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 180))
+            screen.blit(overlay, (0, 0))
+            game_over_font = pygame.font.SysFont("Arial", 60)
+            game_over_text = game_over_font.render("GAME OVER", True, (255, 0, 0))
+            game_over_rect = game_over_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 40))
+            screen.blit(game_over_text, game_over_rect)
+
+            info_text = text_font.render("Press ESC to return to menu", True, (255, 255, 255))
+            info_rect = info_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 20))
+            screen.blit(info_text, info_rect)
+
+            snake.paused = True
+
+        if snake.paused and not game_over:
+            overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 150))
+            screen.blit(overlay, (0, 0))
+            font = pygame.font.SysFont("Arial", 40)
+            text_surf = font.render("Paused - press SPACE to resume", True, (255, 255, 255))
+            text_rect = text_surf.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+            screen.blit(text_surf, text_rect)
+
     pygame.display.flip() # flip th display to put your work on the screen
     clock.tick(snake.speed)
 
