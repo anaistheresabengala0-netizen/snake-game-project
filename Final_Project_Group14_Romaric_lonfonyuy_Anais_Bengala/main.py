@@ -33,12 +33,6 @@ class Food:
         self.position = self.random_position()
 
     def draw(self):
-        #food_rect = pygame.Rect(self.position.x*cell,
-                                #self.position.y*cell,
-                                #cell,
-                                #cell
-        #)
-        # center of the grid
         x = int(self.position.x * cell + cell / 2)
         y = int(self.position.y * cell + cell / 2)
         food_rect = apple.get_rect(center = (x, y))
@@ -247,9 +241,7 @@ start_time = pygame.time.get_ticks()
 
 grid_lines()
 
-while running:
-    # this is the game loop that pools for events
-    # the pygame.QUIT event means the user clicked x to close the window. 
+while running: 
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
@@ -331,16 +323,3 @@ while running:
 
 pygame.quit()
 
-
-"""
-
-The way pygame funstions 
-
-1- first we initialise the pygame after importing it
-2- create the the screen  using the display.setmode 
-3- create and infinite loop and mae it stop wen the user clikcs the x, using the pygame.quit
-4- use screen,fill to overwirte everything on the screen, finalyy use display.flip to put your work on the screen. 
-
-
-
-"""
