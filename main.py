@@ -82,7 +82,6 @@ def grid_lines():
     for x in range(0,WIDTH,20):
         pygame.draw.line(screen, 'yellow2',(x,0),(x,HEIGHT))
     pygame.display.flip()"""
-
     # Drawing lines 
     for y in range(0,HEIGHT,cell):
         for x in range(0, WIDTH, cell):
@@ -93,8 +92,6 @@ def grid_lines():
             else:
                 pygame.draw.rect(screen,'olivedrab3',rect)
     pass
-
-
 
 class Button:
     def __init__(self, text, x, y, width, height, color, hover_color):
@@ -122,8 +119,8 @@ class Button:
 
 
 
-
 btn_easy = Button("EASY", 300, 200, 200, 60, (50, 150, 50), (70, 210, 70))
+
 btn_med  = Button("MEDIUM", 300, 300, 200, 60, (200, 150, 0), (240, 190, 0))
 btn_hard = Button("HARD", 300, 400, 200, 60, (150, 50, 50), (210, 70, 70))
 
