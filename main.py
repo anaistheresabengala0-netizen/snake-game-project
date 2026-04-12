@@ -6,8 +6,8 @@ scene = "MENU"
 current_speed = 5
 current_level = "EASY"
 
-WIDTH = 800
-HEIGHT = 800
+WIDTH = 600
+HEIGHT = 600
 
 cell = 20
 cell_num = 25
