@@ -10,7 +10,7 @@ WIDTH = 600
 HEIGHT = 600
 
 cell = 20
-cell_num = 25
+cell_num = 30
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 
 
@@ -164,19 +164,19 @@ class Snake:
             self.body.pop()  
     
     def move_right(self):
-        if not self.paused:
+        if not self.paused and self.direction.x != -1:
             self.direction = Vector2(1, 0)
 
     def move_left(self):
-        if not self.paused:
+        if not self.paused and self.direction.x != -1:
             self.direction = Vector2(-1, 0)
 
     def move_up(self):
-        if not self.paused:
+        if not self.paused and self.direction.y != -1:
             self.direction = Vector2(0, -1)
 
     def move_down(self):
-        if not self.paused:
+        if not self.paused and self.direction.y != -1:
             self.direction = Vector2(0, 1)
     def pause_game(self):
         self.paused = not self.paused
@@ -232,8 +232,9 @@ class Collisions():
 
     def self_collision(self):
         head = self.snake.body[0]
-        if head in self.snake.body[1:]:
-            return True
+        for segment in self.snake.body[1:]:
+            if head == segment:
+                return True
         return False
 
 
@@ -275,7 +276,7 @@ while running:
 
     #visual elements
    
-    screen.fill("aquamarine3")#yill the screen with a color to wipe away anything from last fram. 
+    screen.fill("aquamarine3")#fill the menu screen with the colour in quotes  
     if scene == "MENU":
         btn_easy.draw(screen)
         btn_med.draw(screen)
@@ -286,16 +287,14 @@ while running:
         food.draw()
         poison.draw()
         track_key_press()
+        
         snake.move()
-        coll.food_collision()
-        coll.poison_collision()
-
         #score and timer
         elapsed_ms = pygame.time.get_ticks() - start_time
         elapsed_sec = elapsed_ms // 1000
         score_and_timer = f"Score: {snake.score}   Time: {elapsed_sec}s"
         score_and_timer_surface = text_font.render(score_and_timer, True, (255, 255, 255))
-        screen.blit(score_and_timer_surface, (10, 750))
+        screen.blit(score_and_timer_surface, (10, HEIGHT-50))
 
         game_over = coll.wall_collision() or coll.self_collision()
         if game_over:
@@ -321,6 +320,11 @@ while running:
             text_surf = font.render("Paused - press SPACE to resume", True, (255, 255, 255))
             text_rect = text_surf.get_rect(center=(WIDTH // 2, HEIGHT // 2))
             screen.blit(text_surf, text_rect)
+
+
+       
+        coll.food_collision()
+        coll.poison_collision()
 
     pygame.display.flip() # flip th display to put your work on the screen
     clock.tick(snake.speed)
