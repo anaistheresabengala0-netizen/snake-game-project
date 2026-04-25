@@ -145,6 +145,7 @@ class Snake:
         for segment in self.body:
             segment_rect = (segment.x * cell, segment.y * cell, cell, cell)# making the snake rectangular (x,y,width,height)
             pygame.draw.rect(screen, "indigo", segment_rect)
+        # print("snake here", self.body)
         
     
     def move(self):
@@ -318,7 +319,7 @@ while running:
         coll.food_collision()
         coll.poison_collision()
 
-    pygame.display.flip() # flip th display to put your work on the screen
+    pygame.display.flip() # flip th display to put the work on the screen
     clock.tick(snake.speed)
 
 pygame.quit()
